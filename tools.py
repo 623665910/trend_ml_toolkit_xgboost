@@ -1,3 +1,4 @@
+#coding=utf-8
 import scipy.sparse
 from sklearn.model_selection import GridSearchCV
 import pandas as pd
@@ -151,6 +152,7 @@ def to_NN(data,label,path,NN_name='NN_train.txt',NN_label_name='NNAI_train.txt')
     :param path: ndarray (N,)
     :return: 
     """
+    assert len(data.shape) == 2
     assert data.shape[0] == label.shape[0] == path.shape[0]
 
     N = data.shape[0]
@@ -159,9 +161,9 @@ def to_NN(data,label,path,NN_name='NN_train.txt',NN_label_name='NNAI_train.txt')
     with open(NN_name,'w') as NN:
         with open(NN_label_name,'w') as NN_label:
             NN.write(str(dim)+'\n')
-            NN_label.write(str(dim)+'\n')
+            # NN_label.write(str(dim)+'\n')
             for i in tqdm(range(N)):
-                case = data[i]
+                case = data[i] # (D,)
                 indice = np.nonzero(case)[0]
                 line = str(label[i])+';'
                 for index in indice:
