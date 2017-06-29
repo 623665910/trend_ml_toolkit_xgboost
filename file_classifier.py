@@ -50,16 +50,31 @@ def search_mv_single_thread(refer,files):
     print('refer  :  %d\n' % (len(refer)))
     print('origin :  %d\n' % (len(files)))
 
+def get_config():
+    config = dict()
+    config['phase'] = 'test'
+    config['handle_path'] = '/macml-data/features/opcode'
+    config['result_path0'] = '/home/lili/opcode-2017-05/train/0'
+    config['result_path1'] = '/home/lili/opcode-2017-05/train/1'
+    config['result_path2'] = '/home/lili/opcode-2017-05/test/0'
+    config['result_path3'] = '/home/lili/opcode-2017-05/test/1'
+    config['train_csv'] = '/home/lili/datasets/2017-05_train.csv'
+    config['test_csv'] = '/home/lili/datasets/2017-05_test.csv'
+    config['processes'] = None
+    return config
+
 if __name__ == '__main__':
 
-    phase = 'test'
+    config = get_config()
 
-    handle_path = '/macml-data/features/opcode'
+    phase = config['phase']
 
-    result_path0 = '/home/lili/opcode-2017-05/train/0'
-    result_path1 = '/home/lili/opcode-2017-05/train/1'
-    result_path2 = '/home/lili/opcode-2017-05/test/0'
-    result_path3 = '/home/lili/opcode-2017-05/test/1'
+    handle_path = config['handle_path']
+
+    result_path0 = config['result_path0']
+    result_path1 = config['result_path1']
+    result_path2 = config['result_path2']
+    result_path3 = config['result_path3']
 
     result_paths = [result_path0,result_path1,result_path2,result_path3]
 
@@ -68,8 +83,8 @@ if __name__ == '__main__':
             os.makedirs(r)
             pass
 
-    train_csv = '/home/lili/datasets/2017-05_train.csv'
-    test_csv = '/home/lili/datasets/2017-05_test.csv'
+    train_csv = config['train_csv']
+    test_csv = config['test_csv']
 
     train_df = pd.read_csv(train_csv)
     test_df = pd.read_csv(test_csv)
@@ -89,7 +104,7 @@ if __name__ == '__main__':
         refer = test_np
 
     partial_search_mv = partial(search_mv,refer=refer,files=files)
-    pool = Pool(processes=None,initializer=start_process)
+    pool = Pool(processes=config['processes'],initializer=start_process)
     pool.map(partial_search_mv,range(len(refer)))
     pool.close()
     pool.join()

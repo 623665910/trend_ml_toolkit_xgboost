@@ -42,6 +42,7 @@ def get_config():
     config['handle_path'] = '/home/raymon/trend_ml_toolkit_xgboost/Data/'
     config['re_path'] = '/home/raymon/trend_ml_toolkit_xgboost/Data/'
     config['length'] = 1024
+    config['processes'] = None
     return config
 
 def handle_f(i,files,config):
@@ -69,6 +70,30 @@ def handle_f(i,files,config):
     assert len(r.columns == config['length'])
     #print(r.columns)
     #print(len(r[0][0]))
+
+def handle_f_single_thread(files,config):
+    N = len(files)
+    for i in tqdm(range(N)):
+        f_full_name = files[i]
+        f_name = f_full_name.split('/')[-1]
+        flag = f_full_name.split('/')[-2]
+        assert flag == '0' or flag == '1'
+        phase = f_full_name.split('/')[-3]
+        assert phase == 'train' or phase == 'test'
+        with open(f_full_name) as f:
+            content = f.read()
+        fea_str = hashlib.shake128(config['length'], content).hexdigest()
+        fea_str_bit = hexstr2bitstr(fea_str)
+
+    fea_str_bit = np.array(fea_str_bit)
+    fea_str_bit = fea_str_bit.reshape((1, -1))
+    assert fea_str_bit.shape[1] == config['length']
+    base_path = os.path.join(config['re_path'], phase + '/' + flag)
+    if (os.path.exists(base_path) == False):
+        os.makedirs(base_path)
+    fea_names = ['f' + str(i) for i in range(config['length'])]
+    r = pd.DataFrame(data=fea_str_bit, columns=fea_names)
+    r.to_csv(base_path + '/' + f_name + '.csv')
 
 if __name__ == '__main__':
 
