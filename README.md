@@ -345,6 +345,60 @@
 
 ## 其他
 
+* feature_clean_Normalize-Opcode.py：去除文件中连续重复的指令（可选），以及将隶属于同一个组的指令映射到该组中的第一个指令（可选），去除非法指令。
+
+  * 举例：xxx.opcode文件内容如下
+
+    ```
+    mov ebp,eap
+    mov
+    mov 
+    add ebp,eap
+    ins1
+    mov
+    ins2
+    abc
+    ```
+
+    其中，前3个mov指令连续出现，则保留一个；ins1与ins2指令属于同一个组（我们假定是这样的），那么ins1与ins2都映射到ins1，abc为非法指令，理应去除。
+
+    处理结果理应如下：
+
+    ```
+    mov
+    add
+    ins1
+    mov
+    ins2
+    ```
+
+  * 用法：feature_clean_Normalize-Opcode.py的选项说明为
+
+    ```python
+    # parser
+    def arg_parser():
+        parser = argparse.ArgumentParser()
+        # 待处理路径
+        parser.add_argument('-i','--inputFolder', required=True)
+        # 输出目录
+        parser.add_argument('-o', '--outputFolder', required=True)
+        # 指令集合文件:工程中已经给出 instructions.txt
+        parser.add_argument('-is', '--instructFile', required=True)
+        # 是否去除 连续重复的 指令
+        parser.add_argument('-rs','--remove',default=1)
+        # 是否将同组的指令映射到该组的第一个指令
+        parser.add_argument('-g','--group',default=1)
+        return parser.parse_args()
+    ```
+
+    ```shell
+    python -i InputFolder/ -o OutputFolder/ -is instructions.txt -rs 1 -g 1
+    ```
+
+  * 该脚本可以稍加修改，改成多线程处理
+
+## 附录
+
 - scikit-learn 模型评估指标
 
     ['accuracy', 'adjusted_rand_score', 'average_precision', 'f1', 'f1_macro', 'f1_micro', 'f1_samples', 'f1_weighted', 'neg_log_loss', 'neg_mean_absolute_error', 'neg_mean_squared_error', 'neg_median_absolute_error', 'precision', 'precision_macro', 'precision_micro', 'precision_samples', 'precision_weighted', 'r2', 'recall', 'recall_macro', 'recall_micro', 'recall_samples', 'recall_weighted', 'roc_auc']
